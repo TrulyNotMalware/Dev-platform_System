@@ -23,7 +23,7 @@ yum -y update
 
 
 #Package lists.
-rpm_check_list=( "yum-utils" "make" "device-mapper-persistent-data" "lvm2")
+rpm_check_list=( "yum-utils" "make" "device-mapper-persistent-data" "lvm2" "nfs-utils")
 
 install_options="-y"
 _rpm_is_install_packages(){

@@ -45,3 +45,11 @@ sed -i'' -r -e "/contexts:/a\\
 
 sed -i "s/^current-context: kubernetes-admin@kubernetes$/current-context: ${namespace}/" /home/${users}/.kube/config
 
+#install k9s
+echo ""
+echo "==============="
+echo "Install k9s...."
+echo "==============="
+curl -sS https://webinstall.dev/k9s | bash
+
+
