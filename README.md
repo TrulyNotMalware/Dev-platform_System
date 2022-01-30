@@ -14,6 +14,7 @@ sudo ./1.install_kubernetes.sh
 
 #User account.
 ./2.setting_kubelet.sh
+./3.nfs-server.sh
 
 #Check
 kubectl get pod -A
