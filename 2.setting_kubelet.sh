@@ -11,6 +11,7 @@ else
 fi
 
 users=`who | awk '{print $1}'`
+node_name="master"
 
 echo "==========================="
 echo "Create Weavenet Objects..."
@@ -44,6 +45,36 @@ sed -i'' -r -e "/contexts:/a\\
 " /home/${users}/.kube/config
 
 sed -i "s/^current-context: kubernetes-admin@kubernetes$/current-context: ${namespace}/" /home/${users}/.kube/config
+
+#create create-dir
+mkdir yamls/created
+cp ${config_template_location} yamls/created/
+
+echo "================================================"
+echo "Create ConfigMap in yamls/created/configmap.yaml"
+echo "================================================"
+config_template_location="yamls/templates/configmap-template.yaml"
+ip_addr=`hostname -I| awk '{print $1}'`
+certificateAuthorityData=$(grep -r 'certificate-authority-data:' ~/.kube/config | awk '{ print $2 }')
+clientCertificateData=$(grep -r 'client-certificate-data:' ~/.kube/config | awk '{ print $2 }')
+clientKeyData=$(grep -r 'client-key-data:' ~/.kube/config | awk '{ print $2 }')
+
+#create create-dir & Copy.
+mkdir yamls/created
+cp ${config_template_location} yamls/created/configmap.yaml
+
+sed -i "s/certificate-authority-data:$/certificate-authority-data: ${certificateAuthorityData}/g" yamls/created/configmap.yaml
+sed -i "s/client-certificate-data:$/client-certificate-data: ${clientCertificateData}/g" yamls/created/configmap.yaml
+sed -i "s/client-key-data:$/client-key-data: ${clientKeyData}/g" yamls/created/configmap.yaml
+sed -i "s/USER_NAME$/${users}/g" yamls/created/configmap.yaml
+sed -i "s/NAME_SPACE$/${namespace}/g" yamls/created/configmap.yaml
+sed -i "s/IP_ADDR:6443$/${ip_addr}:6443/g" yamls/created/configmap.yaml
+
+#Apply files.
+kubectl create -f yamls/created/configmap.yaml
+#Check
+kubectl get cm -A | grep ${users}
+
 
 #install k9s
 echo ""
