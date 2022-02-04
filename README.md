@@ -26,4 +26,4 @@ kubectl get pod -A
 ## Install lists
 + docker
 + kubernetes
-
++ nfs-utils

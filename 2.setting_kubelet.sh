@@ -75,7 +75,6 @@ kubectl create -f yamls/created/configmap.yaml
 #Check
 kubectl get cm -A | grep ${users}
 
-
 #install k9s
 echo ""
 echo "==============="

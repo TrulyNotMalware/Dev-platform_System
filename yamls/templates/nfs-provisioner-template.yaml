@@ -1,35 +1,54 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: nfs-pod-provisioner
+  name: nfs-client-nfs-client-provisioner
+  labels:
+    app: nfs-client-provisioner
+    chart: nfs-client-provisioner-1.2.9
+    heritage: Tiller
+    release: nfs-client
 spec:
-  selector:
-    matchLabels:
-      app: nfs-pod-provisioner
   replicas: 1
   strategy:
     type: Recreate
+  selector:
+    matchLabels:
+      app: nfs-client-provisioner
+      release: nfs-client
   template:
     metadata:
+      annotations:
       labels:
-        app: nfs-pod-provisioner
+        app: nfs-client-provisioner
+        release: nfs-client
     spec:
-      serviceAccountName: nfs-provisioner-sa
+      affinity:
+        nodeAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 50
+            preference:
+              matchExpressions:
+                - key: dev-pjt-master
+                  operator: In
+                  values:
+                    - "true"
+      serviceAccountName: nfs-client-nfs-client-provisioner
       containers:
-        - name: nfs-pod-provisioner
-          image: quay.io/external_storage/nfs-client-provisioner:latest
+        - name: nfs-client-provisioner
+          image: "quay.io/external_storage/nfs-client-provisioner:v3.1.0-k8s1.11"
+          imagePullPolicy: IfNotPresent
           volumeMounts:
-            - name: nfs-provisioner-v
+            - name: nfs-client-root
               mountPath: /persistentvolumes
           env:
             - name: PROVISIONER_NAME
-              value: nfs-provisioner
+              value: cluster.local/nfs-client-nfs-client-provisioner
             - name: NFS_SERVER
-              value: "IP_ADDRESS_NFS"
+              value: {nfs_server}
             - name: NFS_PATH
-              value: "DIRECTORY_PATH_NFS"
+              value: {nfs_path}
       volumes:
-        - name: nfs-provisioner-v
+        - name: nfs-client-root
           nfs:
-            server: "IP_ADDRESS_NFS"
-            path : "DIRECTORY_PATH_NFS"
+            server: {nfs_server}
+            path: {nfs_path}
