@@ -11,7 +11,8 @@ else
 fi
 
 users=`who | awk '{print $1}'`
-node_name="master"
+#node_name="master"
+node_name=`hostname`
 
 echo "==========================="
 echo "Create Weavenet Objects..."
@@ -82,4 +83,7 @@ echo "Install k9s...."
 echo "==============="
 curl -sS https://webinstall.dev/k9s | bash
 
-
+echo ""
+echo "========="
+echo "Finished."
+echo "========="

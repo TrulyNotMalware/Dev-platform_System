@@ -1,6 +1,5 @@
 #!/bin/bash
 
-
 #check is Root?
 #==============
 if (( $EUID != 0 )); then
@@ -53,10 +52,18 @@ echo "Init Kubelet.... in ${IP_ADDR}."
 echo "==============================="
 #Init kubelet.
 kubeadm config images pull
-kubeadm init --apiserver-advertise-address "${IP_ADDR}" --node-name master --pod-network-cidr "${POD_NET}" --service-cidr "${SERVICE_NET}"
+#[FIXME] Need to check node name is exactly same with hostname.
+#2022/02/04 Update init commands.
+#node_name=`kubectl get node -o wide | grep ${IP_ADDR} | awk '{print $1}'`
+node_name=`hostname`
+#sed -e "s/{NODE_NAME}/${node_name}/g" < yamls/template/kubernetes-init-template.yaml > yamls/created/init-config.yaml
+#sed -i "s/{IP_ADDR}/${IP_ADDR}/g" yamls/created/init-config.yaml
+#kubeadm init --config yamls/created/init-config.yaml --upload-certs --v=5 --ignore-preflight-errors=all
+kubeadm init --apiserver-advertise-address "${IP_ADDR}" --node-name ${node_name} --pod-network-cidr "${POD_NET}" --service-cidr "${SERVICE_NET}"
 
 users=`who | awk '{print $1}'`
-node_name=`hostname`
+#OR
+#users=`whoami`
 echo "=============================================="
 echo "Copy config files into /home/${users}/.kube..."
 echo "=============================================="

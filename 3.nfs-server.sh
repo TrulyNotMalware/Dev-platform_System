@@ -68,6 +68,7 @@ echo "==========================================================================
 docker pull ${docker_image}
 
 #[FIXME] Node label adding is wired.... not working
+#########################################################################
 node_name=`kubectl get node -o wide | grep ${IP_ADDR} | awk '{print $1}'`
 label_name="dev-pjt-master=true"
 echo ${node_name}
@@ -81,6 +82,7 @@ kubectl label nodes ${node_name} ${label_name}
 #Check
 kubectl get nodes --show-labels | grep ${label_name}
 
+#########################################################################
 echo ""
 echo "======================================="
 echo "Create nfs serviceAccount & Provisioner"

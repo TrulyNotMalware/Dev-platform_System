@@ -1,0 +1,11 @@
+apiVersion: kubeadm.k8s.io/v1beta1
+kind: ClusterConfiguration
+kubernetesVersion: v1.18.19
+controlPlaneEndpoint: "{IP_ADDR}:6443"
+apiServer:
+  certSANs:
+  - {NODE_NAME}
+  - {IP_ADDR}
+networking:
+  podSubnet: 6.2.0.0/16
+  serviceSubnet: 6.5.0.0/16

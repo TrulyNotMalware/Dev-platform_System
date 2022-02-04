@@ -120,6 +120,8 @@ else
 #Add Docker group
 
 users=`who | awk '{print $1}'`
+#Or
+#users=`whoami`
 echo""
 echo "================================"
 echo "Add User [${users}] into Docker group."
