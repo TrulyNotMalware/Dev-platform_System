@@ -47,10 +47,6 @@ sed -i'' -r -e "/contexts:/a\\
 
 sed -i "s/^current-context: kubernetes-admin@kubernetes$/current-context: ${namespace}/" /home/${users}/.kube/config
 
-#create create-dir
-mkdir yamls/created
-cp ${config_template_location} yamls/created/
-
 echo "================================================"
 echo "Create ConfigMap in yamls/created/configmap.yaml"
 echo "================================================"
