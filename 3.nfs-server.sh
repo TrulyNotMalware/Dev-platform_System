@@ -3,8 +3,8 @@
 #check is Root?
 #==============
 if (( $EUID != 0 )); then
-        echo "SUDO NEED."
-	exit
+        echo "SUDO NEED"
+	exit 100
 else
 	echo "PASS"
 fi

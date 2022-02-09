@@ -13,7 +13,7 @@ metadata:
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: mariadb-cluster-primary
+  name: mariadb-cluster
   namespace: NAME_SPACE
   labels:
     app.kubernetes.io/name: mariadb
@@ -75,7 +75,7 @@ spec:
     app.kubernetes.io/instance: mariadb-cluster
     app.kubernetes.io/component: database
 ---
-piVersion: apps/v1
+apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: mariadb-cluster-statefulset
@@ -98,8 +98,8 @@ spec:
     type: RollingUpdate
   template:
     metadata:
-      annotations:
-        checksum/configuration: 375c9348982c6c547f47c80b270af75457bbf3e64fcbe2b89f69097b3d8233a2
+      #annotations:
+      #  checksum/configuration: 375c9348982c6c547f47c80b270af75457bbf3e64fcbe2b89f69097b3d8233a2
       labels:
         app.kubernetes.io/name: mariadb
         helm.sh/chart: mariadb-10.3.32

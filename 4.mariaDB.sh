@@ -17,6 +17,9 @@ echo "         Tags : 10.3.32"
 echo "==================================="
 
 docker pull mariadb:10.3.32
+docker pull bitnami/mariadb:10.3.32-debian-10-r85
+docker pull docker.io/bitnami/minideb:buster
+
 
 mariadb_root_pwd="devproject"
 mariadb_user_name="devs"
@@ -41,20 +44,24 @@ sed -i "s/NAME_SPACE$/${name_space}/g" yamls/created/mariadb-secret.yaml
 
 
 #Apply
-#kubectl apply -f yamls/created/mariadb-secret.yaml
+kubectl apply -f yamls/created/mariadb-secret.yaml
 
 #Check
-#kubectl get secret
+echo "===================================================="
+kubectl get secret
+echo "===================================================="
 
 storage_size="8Gi"
 #Create pvc
 sed -e "s/STORAGE_SIZE/${storage_size}/g" < ${template_location}/mariadb-pvc-template.yaml > yamls/created/mariadb-pvc.yaml
 
 #Apply
-#kubectl apply -f yamls/created/mariadb-pvc.yaml
+kubectl apply -f yamls/created/mariadb-pvc.yaml
 
 #Check
-#kubectl get pvc -A | grep mariadb
+echo "===================================================="
+kubectl get pvc -A | grep mariadb
+echo "===================================================="
 
 #Create mariadb-cluster
 mariadb_node_port=30006
@@ -64,7 +71,12 @@ sed -i "s/NODE_PORT/${mariadb_node_port}/g" yamls/created/mariadb.yaml
 sed -i "s/MARIA_DB_USER_NAME/${mariadb_user_name}/g" yamls/created/mariadb.yaml
 
 #Apply
-#kubectl apply -f yamls/created/mariadb.yaml
+kubectl apply -f yamls/created/mariadb.yaml
 
 #Check
-#kubectl get pod -A |grep mariadb
+echo "===================================================="
+kubectl get pod -A |grep mariadb
+echo "===================================================="
+
+
+
