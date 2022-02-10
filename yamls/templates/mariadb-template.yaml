@@ -146,7 +146,7 @@ spec:
             runAsUser: 0
           volumeMounts:
             - name: data
-              mountPath: /bitnami/mariadb
+              mountPath: /bitnami/msd_sdkariadb
       containers:
         - name: mariadb
           image: bitnami/mariadb:10.3.32-debian-10-r85

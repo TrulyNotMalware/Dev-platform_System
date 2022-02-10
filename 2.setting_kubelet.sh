@@ -37,6 +37,7 @@ echo "==================================================="
 #create Namespace.
 kubectl create -f yamls/namespace.yaml
 
+##############################################################
 sed -i'' -r -e "/contexts:/a\\
 - context:\n\
     cluster: kubernetes\n\
@@ -71,6 +72,13 @@ sed -i "s/IP_ADDR:6443$/${ip_addr}:6443/g" yamls/created/configmap.yaml
 kubectl create -f yamls/created/configmap.yaml
 #Check
 kubectl get cm -A | grep ${users}
+##############################################################
+
+#0210 Try more easy way to build.
+kubectl config set-context ${namespace} --namespace=${namespace} --cluster=kubernetes --user=kubernetes-admin
+
+#Apply
+kubectl config use-context ${namespace}
 
 #install k9s
 echo ""

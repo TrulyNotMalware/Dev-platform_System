@@ -16,12 +16,7 @@ data:
         cluster: kubernetes
         user: kubernetes-admin
         namespace: NAME_SPACE
-      name: devai-cluster
-    - context:
-        cluster: kubernetes
-        namespace: NAME_SPACE
-        user: kubernetes-admin
-      name:
+      name: NAME_SPACE
     current-context: NAME_SPACE
     kind: Config
     preferences: {}
