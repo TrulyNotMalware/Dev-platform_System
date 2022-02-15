@@ -91,6 +91,7 @@ echo "======================================="
 
 #Copy sa
 cp ${template_location}${nfs_sa_template} yamls/created/nfs-sa.yaml
+sed -i "s/NAME_SPACE/${name_space}/g" yamls/created/nfs-sa.yaml
 
 #Apply
 kubectl apply -f yamls/created/nfs-sa.yaml
@@ -98,15 +99,6 @@ echo "==========================================================================
 kubectl get serviceaccount -A | grep nfs
 echo "================================================================================"
 
-#Create Storage class for dynamic provisioning.
-cp ${template_location}${storage_template} yamls/created/storage-class.yaml
-sed -i "s/CLASS_NAME$/${storage_class_name}/g" yamls/created/storage-class.yaml
-
-#Apply
-kubectl apply -f yamls/created/storage-class.yaml
-echo "================================================================================"
-kubectl get storageclass -A | grep nfs
-echo "================================================================================"
 #Create deployment
 #cp ${template_location}${nfs_template} yamls/created/nfs-provisioner.yaml
 
@@ -117,4 +109,15 @@ sed -i "s/${nfs_template_path}$/${nfs_path}/g" yamls/created/nfs-provisioner.yam
 kubectl apply -f yamls/created/nfs-provisioner.yaml
 echo "================================================================================"
 kubectl get deployment -A | grep nfs
+echo "================================================================================"
+
+
+#Create Storage class for dynamic provisioning.
+cp ${template_location}${storage_template} yamls/created/storage-class.yaml
+sed -i "s/CLASS_NAME$/${storage_class_name}/g" yamls/created/storage-class.yaml
+
+#Apply
+kubectl apply -f yamls/created/storage-class.yaml
+echo "================================================================================"
+kubectl get storageclass -A | grep nfs
 echo "================================================================================"

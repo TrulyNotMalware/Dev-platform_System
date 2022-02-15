@@ -2,21 +2,15 @@ apiVersion: v1
 kind: ServiceAccount
 metadata:
   labels:
-    app: nfs-client-provisioner
-    chart: nfs-client-provisioner-1.2.9
-    heritage: Tiller
-    release: nfs-client
-  name: nfs-client-nfs-client-provisioner
+    app: nfs-provisioner
+  name: nfs-nfs-provisioner
 ---
 kind: ClusterRole
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
   labels:
-    app: nfs-client-provisioner
-    chart: nfs-client-provisioner-1.2.9
-    heritage: Tiller
-    release: nfs-client
-  name: nfs-client-nfs-client-provisioner-runner
+    app: nfs-provisioner
+  name: nfs-nfs-provisioner-runner
 rules:
   - apiGroups: [""]
     resources: ["persistentvolumes"]
@@ -35,29 +29,23 @@ kind: ClusterRoleBinding
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
   labels:
-    app: nfs-client-provisioner
-    chart: nfs-client-provisioner-1.2.9
-    heritage: Tiller
-    release: nfs-client
-  name: run-nfs-client-nfs-client-provisioner
+    app: nfs-provisioner
+  name: run-nfs-nfs-provisioner
 subjects:
   - kind: ServiceAccount
-    name: nfs-client-nfs-client-provisioner
-    namespace: sodaflow
+    name: nfs-nfs-provisioner
+    namespace: NAME_SPACE
 roleRef:
   kind: ClusterRole
-  name: nfs-client-nfs-client-provisioner-runner
+  name: nfs-nfs-provisioner-runner
   apiGroup: rbac.authorization.k8s.io
 ---
 kind: Role
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
   labels:
-    app: nfs-client-provisioner
-    chart: nfs-client-provisioner-1.2.9
-    heritage: Tiller
-    release: nfs-client
-  name: leader-locking-nfs-client-nfs-client-provisioner
+    app: nfs-provisioner
+  name: leader-locking-nfs-nfs-provisioner
 rules:
   - apiGroups: [""]
     resources: ["endpoints"]
@@ -67,16 +55,13 @@ kind: RoleBinding
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
   labels:
-    app: nfs-client-provisioner
-    chart: nfs-client-provisioner-1.2.9
-    heritage: Tiller
-    release: nfs-client
-  name: leader-locking-nfs-client-nfs-client-provisioner
+    app: nfs-provisioner
+  name: leader-locking-nfs-nfs-provisioner
 subjects:
   - kind: ServiceAccount
-    name: nfs-client-nfs-client-provisioner
-    namespace: sodaflow
+    name: nfs-nfs-provisioner
+    namespace: NAME_SPACE
 roleRef:
   kind: Role
-  name: leader-locking-nfs-client-nfs-client-provisioner
+  name: leader-locking-nfs-nfs-provisioner
   apiGroup: rbac.authorization.k8s.io
