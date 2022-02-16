@@ -5,22 +5,18 @@ metadata:
   namespace: NAME_SPACE
   labels:
     app.kubernetes.io/name: mariadb
-    helm.sh/chart: mariadb-10.3.32
     app.kubernetes.io/instance: mariadb-cluster
-    app.kubernetes.io/managed-by: Helm
   annotations:
 ---
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: mariadb-cluster
+  name: mariadb-cluster-primary
   namespace: NAME_SPACE
   labels:
     app.kubernetes.io/name: mariadb
-    helm.sh/chart: mariadb-10.3.32
     app.kubernetes.io/instance: mariadb-cluster
-    app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/component: database
+    app.kubernetes.io/component: primary
 data:
   my.cnf: |-
     [mysqld]
@@ -51,16 +47,50 @@ data:
     pid-file=/opt/bitnami/mariadb/tmp/mysqld.pid
 ---
 apiVersion: v1
-kind: Service
+kind: ConfigMap
 metadata:
-  name: mariadb-cluster-svc
+  name: mariadb-cluster-secondary
   namespace: NAME_SPACE
   labels:
     app.kubernetes.io/name: mariadb
-    helm.sh/chart: mariadb-10.3.32
     app.kubernetes.io/instance: mariadb-cluster
-    app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/component: database
+    app.kubernetes.io/component: secondary
+data:
+  my.cnf: |-
+    [mysqld]
+    skip-name-resolve
+    explicit_defaults_for_timestamp
+    basedir=/opt/bitnami/mariadb
+    port=3306
+    socket=/opt/bitnami/mariadb/tmp/mysql.sock
+    tmpdir=/opt/bitnami/mariadb/tmp
+    max_allowed_packet=16M
+    bind-address=0.0.0.0
+    pid-file=/opt/bitnami/mariadb/tmp/mysqld.pid
+    log-error=/opt/bitnami/mariadb/logs/mysqld.log
+    character-set-server=UTF8
+    collation-server=utf8_general_ci
+    autocommit=1
+
+    [client]
+    port=3306
+    socket=/opt/bitnami/mariadb/tmp/mysql.sock
+    default-character-set=UTF8
+
+    [manager]
+    port=3306
+    socket=/opt/bitnami/mariadb/tmp/mysql.sock
+    pid-file=/opt/bitnami/mariadb/tmp/mysqld.pid
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mariadb-cluster-primary-svc
+  namespace: NAME_SPACE
+  labels:
+    app.kubernetes.io/name: mariadb
+    app.kubernetes.io/instance: mariadb-cluster
+    app.kubernetes.io/component: primary
   annotations:
 spec:
   type: NodePort
@@ -73,39 +103,56 @@ spec:
   selector:
     app.kubernetes.io/name: mariadb
     app.kubernetes.io/instance: mariadb-cluster
-    app.kubernetes.io/component: database
+    app.kubernetes.io/component: primary
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mariadb-cluster-secondary-svc
+  namespace: NAME_SPACE
+  labels:
+    app.kubernetes.io/name: mariadb
+    app.kubernetes.io/instance: mariadb-cluster
+    app.kubernetes.io/component: secondary
+  annotations:
+spec:
+  type: ClusterIP
+  ports:
+    - name: mysql
+      port: 3306
+      protocol: TCP
+      targetPort: mysql
+      nodePort: null
+  selector:
+    app.kubernetes.io/name: mariadb
+    app.kubernetes.io/instance: mariadb-cluster
+    app.kubernetes.io/component: secondary
 ---
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: mariadb-cluster-statefulset
+  name: mariadb-cluster-primary-statefulset
   namespace: NAME_SPACE
   labels:
     app.kubernetes.io/name: mariadb
-    helm.sh/chart: mariadb-10.3.32
     app.kubernetes.io/instance: mariadb-cluster
-    app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/component: database
+    app.kubernetes.io/component: primary
 spec:
   replicas: 1
   selector:
     matchLabels:
       app.kubernetes.io/name: mariadb
       app.kubernetes.io/instance: mariadb-cluster
-      app.kubernetes.io/component: database
-  serviceName: mariadb-cluster-svc
+      app.kubernetes.io/component: primary
+  serviceName: mariadb-cluster-primary-svc
   updateStrategy:
     type: RollingUpdate
   template:
     metadata:
-      #annotations:
-      #  checksum/configuration: 375c9348982c6c547f47c80b270af75457bbf3e64fcbe2b89f69097b3d8233a2
       labels:
         app.kubernetes.io/name: mariadb
-        helm.sh/chart: mariadb-10.3.32
         app.kubernetes.io/instance: mariadb-cluster
-        app.kubernetes.io/managed-by: Helm
-        app.kubernetes.io/component: database
+        app.kubernetes.io/component: primary
     spec:
       serviceAccountName: mariadb-cluster
       affinity:
@@ -117,7 +164,7 @@ spec:
                   matchLabels:
                     app.kubernetes.io/name: mariadb
                     app.kubernetes.io/instance: mariadb-cluster
-                    app.kubernetes.io/component: database
+                    app.kubernetes.io/component: primary
                 namespaces:
                   - "NAME_SPACE"
                 topologyKey: kubernetes.io/hostname
@@ -146,7 +193,7 @@ spec:
             runAsUser: 0
           volumeMounts:
             - name: data
-              mountPath: /bitnami/msd_sdkariadb
+              mountPath: /bitnami/mariadb
       containers:
         - name: mariadb
           image: bitnami/mariadb:10.3.32-debian-10-r85
@@ -162,7 +209,7 @@ spec:
                   name: mariadb-cluster
                   key: mariadb-root-password
             - name: MARIADB_USER
-              value: "MARIA_DB_USER_NAME"
+              value: "admin"
             - name: MARIADB_PASSWORD
               valueFrom:
                 secretKeyRef:
@@ -195,7 +242,7 @@ spec:
                 - |
                   password_aux="${MARIADB_ROOT_PASSWORD:-}"
                   if [[ -f "${MARIADB_ROOT_PASSWORD_FILE:-}" ]]; then
-                      pssword_aux=$(cat "$MARIADB_ROOT_PASSWORD_FILE")
+                      password_aux=$(cat "$MARIADB_ROOT_PASSWORD_FILE")
                   fi
                   mysqladmin status -uroot -p"${password_aux}"
           readinessProbe:
@@ -226,7 +273,154 @@ spec:
       volumes:
         - name: config
           configMap:
-            name: mariadb-cluster
+            name: mariadb-cluster-primary
         - name: data
           persistentVolumeClaim:
-            claimName: mariadb-volume
+            claimName: mariadb-volume-primary
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: mariadb-cluster-secondary-statefulset
+  namespace: NAME_SPACE
+  labels:
+    app.kubernetes.io/name: mariadb
+    app.kubernetes.io/instance: mariadb-cluster
+    app.kubernetes.io/component: secondary
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: mariadb
+      app.kubernetes.io/instance: mariadb-cluster
+      app.kubernetes.io/component: secondary
+  serviceName: mariadb-cluster-secondary-svc
+  updateStrategy:
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: mariadb
+        app.kubernetes.io/instance: mariadb-cluster
+        app.kubernetes.io/component: secondary
+    spec:
+      serviceAccountName: mariadb-cluster
+      affinity:
+        podAffinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - podAffinityTerm:
+                labelSelector:
+                  matchLabels:
+                    app.kubernetes.io/name: mariadb
+                    app.kubernetes.io/instance: mariadb-cluster
+                    app.kubernetes.io/component: secondary
+                namespaces:
+                  - "NAME_SPACE"
+                topologyKey: kubernetes.io/hostname
+              weight: 1
+        nodeAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 50
+            preference:
+              matchExpressions:
+                - key: dev-pjt-master
+                  operator: In
+                  values:
+                    - "true"
+      securityContext:
+        fsGroup: 1000
+      initContainers:
+        - name: volume-permissions
+          image: docker.io/bitnami/minideb:buster
+          imagePullPolicy: "Always"
+          command:
+            - /bin/bash
+            - -ec
+            - |
+              chown -R 1000:1000 /bitnami/mariadb
+          securityContext:
+            runAsUser: 0
+          volumeMounts:
+            - name: data
+              mountPath: /bitnami/mariadb
+      containers:
+        - name: mariadb
+          image: bitnami/mariadb:10.3.32-debian-10-r85
+          imagePullPolicy: "IfNotPresent"
+          securityContext:
+            runAsUser: 1000
+          env:
+            - name: BITNAMI_DEBUG
+              value: "true"
+            - name: MARIADB_REPLICATION_MODE
+              value: "slave"
+            - name: MARIADB_MASTER_HOST
+              value: mariadb-cluster-primary-statefulset
+            - name: MARIADB_MASTER_PORT_NUMBER
+              value: "3306"
+            - name: MARIADB_MASTER_ROOT_USER
+              value: "root"
+            - name: MARIADB_MASTER_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mariadb-cluster
+                  key: mariadb-root-password
+            - name: MARIADB_REPLICATION_USER
+              value: "replicator"
+            - name: MARIADB_REPLICATION_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mariadb-cluster
+                  key: mariadb-replication-password
+          ports:
+            - name: mysql
+              containerPort: 3306
+          livenessProbe:
+            failureThreshold: 3
+            initialDelaySeconds: 120
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+            exec:
+              command:
+                - /bin/bash
+                - -ec
+                - |
+                  password_aux="${MARIADB_MASTER_ROOT_PASSWORD:-}"
+                  if [[ -f "${MARIADB_MASTER_ROOT_PASSWORD_FILE:-}" ]]; then
+                      password_aux=$(cat "$MARIADB_MASTER_ROOT_PASSWORD_FILE")
+                  fi
+                  mysqladmin status -uroot -p"${password_aux}"
+          readinessProbe:
+            failureThreshold: 3
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+            exec:
+              command:
+                - /bin/bash
+                - -ec
+                - |
+                  password_aux="${MARIADB_MASTER_ROOT_PASSWORD:-}"
+                  if [[ -f "${MARIADB_MASTER_ROOT_PASSWORD_FILE:-}" ]]; then
+                      password_aux=$(cat "$MARIADB_MASTER_ROOT_PASSWORD_FILE")
+                  fi
+                  mysqladmin status -uroot -p"${password_aux}"
+          resources:
+            limits: {}
+            requests: {}
+          volumeMounts:
+            - name: data
+              mountPath: /bitnami/mariadb
+            - name: config
+              mountPath: /opt/bitnami/mariadb/conf/my.cnf
+              subPath: my.cnf
+      volumes:
+        - name: config
+          configMap:
+            name: mariadb-cluster-secondary
+        - name: data
+          persistentVolumeClaim:
+            claimName: mariadb-volume-secondary

@@ -18,6 +18,7 @@ echo "==================================="
 
 docker pull mariadb:10.3.32
 docker pull bitnami/mariadb:10.3.32-debian-10-r85
+#docker pull docker.io/bitnami/mariadb:10.5.8-debian-10-r69
 docker pull docker.io/bitnami/minideb:buster
 
 

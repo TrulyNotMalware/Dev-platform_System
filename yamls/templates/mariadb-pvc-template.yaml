@@ -1,11 +1,11 @@
 kind: PersistentVolumeClaim
 apiVersion: v1
 metadata:
-  name: mariadb-volume
+  name: mariadb-volume-primary
   labels:
     app.kubernetes.io/name: mariadb
     app.kubernetes.io/instance: mariadb-cluster
-    app.kubernetes.io/component: database
+    app.kubernetes.io/component: primary
 spec:
   storageClassName: nfs-storageclass
   accessModes:
@@ -13,3 +13,20 @@ spec:
   resources:
     requests:
       storage: STORAGE_SIZE
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: mariadb-volume-secondary
+  labels:
+    app.kubernetes.io/name: mariadb
+    app.kubernetes.io/instance: mariadb-cluster
+    app.kubernetes.io/component: secondary
+spec:
+  storageClassName: nfs-storageclass
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: STORAGE_SIZE
+
