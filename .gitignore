@@ -3,3 +3,6 @@ yamls/created
 
 #test-shells
 test.sh
+
+#MAC
+.DS_Store
