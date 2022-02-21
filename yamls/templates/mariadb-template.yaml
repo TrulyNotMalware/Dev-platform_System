@@ -196,7 +196,8 @@ spec:
               mountPath: /bitnami/mariadb
       containers:
         - name: mariadb
-          image: bitnami/mariadb:10.3.32-debian-10-r85
+          #image: bitnami/mariadb:10.3.32-debian-10-r85
+          image: docker.io/bitnami/mariadb:10.5.8-debian-10-r69
           imagePullPolicy: "IfNotPresent"
           securityContext:
             runAsUser: 1000
@@ -346,7 +347,8 @@ spec:
               mountPath: /bitnami/mariadb
       containers:
         - name: mariadb
-          image: bitnami/mariadb:10.3.32-debian-10-r85
+          #image: bitnami/mariadb:10.3.32-debian-10-r85
+          image: docker.io/bitnami/mariadb:10.5.8-debian-10-r69
           imagePullPolicy: "IfNotPresent"
           securityContext:
             runAsUser: 1000

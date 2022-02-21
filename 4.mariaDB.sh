@@ -22,6 +22,7 @@ docker pull bitnami/mariadb:10.3.32-debian-10-r85
 docker pull docker.io/bitnami/minideb:buster
 
 
+mariadb_database_name="devproject"
 mariadb_root_pwd="devproject"
 mariadb_user_name="devs"
 mariadb_pwd="devproject"
@@ -70,6 +71,7 @@ mariadb_node_port=30006
 sed -e "s/NAME_SPACE/${name_space}/g" < ${template_location}/mariadb-template.yaml > yamls/created/mariadb.yaml
 sed -i "s/NODE_PORT/${mariadb_node_port}/g" yamls/created/mariadb.yaml
 sed -i "s/MARIA_DB_USER_NAME/${mariadb_user_name}/g" yamls/created/mariadb.yaml
+sed -i "s/MARIA_DB_DATABASE_NAME/${mariadb_database_name}/g" yamls/created/mariadb.yaml
 
 #Apply
 kubectl apply -f yamls/created/mariadb.yaml
