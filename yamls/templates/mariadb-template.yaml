@@ -217,7 +217,7 @@ spec:
                   name: mariadb-cluster
                   key: mariadb-password
             - name: MARIADB_DATABASE
-              value: "NAME_SPACE"
+              value: "MARIA_DB_DATABASE_NAME"
             - name: MARIADB_REPLICATION_MODE
               value: "master"
             - name: MARIADB_REPLICATION_USER

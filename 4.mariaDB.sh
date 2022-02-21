@@ -39,9 +39,11 @@ name_space="dev-project"
 
 cp ${template_location}${secret} yamls/created/mariadb-secret.yaml
 
-sed -i "s/MARIA_DB_ROOT_PWD/$(echo ${mariadb_root_pwd}|base64| tr -d '\n')/g" yamls/created/mariadb-secret.yaml
-sed -i "s/MARIA_DB_PWD/$(echo ${mariadb_pwd}|base64|tr -d '\n')/g" yamls/created/mariadb-secret.yaml
-sed -i "s/MARIA_DB_REPLICATION_PWD/$(echo ${mariadb_replication_pwd}|base64|tr -d '\n')/g" yamls/created/mariadb-secret.yaml
+#Delte character '\n' in echo.
+#echo ~~ -> echo -n ~~~
+sed -i "s/MARIA_DB_ROOT_PWD/$(echo -n ${mariadb_root_pwd}|base64)/g" yamls/created/mariadb-secret.yaml
+sed -i "s/MARIA_DB_PWD/$(echo -n ${mariadb_pwd}|base64|tr -d '\n')/g" yamls/created/mariadb-secret.yaml
+sed -i "s/MARIA_DB_REPLICATION_PWD/$(echo -n ${mariadb_replication_pwd}|base64|tr -d '\n')/g" yamls/created/mariadb-secret.yaml
 sed -i "s/NAME_SPACE$/${name_space}/g" yamls/created/mariadb-secret.yaml
 
 
