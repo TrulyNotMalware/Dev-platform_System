@@ -38,4 +38,4 @@ spec:
           name: http
         env:
         - name: ELASTICSEARCH_URL
-          value: "http://elasticsearch:ELASTIC_PORT"
+          value: "http://elasticsearch-svc:ELASTIC_PORT"

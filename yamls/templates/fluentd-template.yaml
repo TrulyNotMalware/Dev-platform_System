@@ -28,7 +28,8 @@ spec:
         image: fluent/fluentd-kubernetes-daemonset:elasticsearch
         env:
           - name: FLUENT_ELASTICSEARCH_HOST
-            value: "elasticsearch"
+#            value: "elasticsearch-svc.default.svc.cluster.local"
+            value: "elasticsearch-svc"
           - name: FLUENT_ELASTICSEARCH_PORT
             value: "ELASTIC_PORT"
           - name: FLUENT_ELASTICSEARCH_SCHEME

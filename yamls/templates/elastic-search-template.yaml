@@ -16,15 +16,17 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: elasticsearch
+  name: elasticsearch-svc
   namespace: kube-system
 spec:
+  type: NodePort
   selector:
     app: elasticsearch
   ports:
   - protocol: TCP
     port: ELASTIC_PORT
     targetPort: http
+    nodePort: ELASTIC_NODE_PORT
 ---
 apiVersion: apps/v1
 kind: Deployment
