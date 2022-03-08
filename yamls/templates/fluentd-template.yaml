@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: DaemonSet
 metadata:
   name: fluentd
-  namespace: kube-system
+  namespace: NAME_SPACE
   labels:
     app: fluentd-logging
     version: v1
@@ -26,6 +26,7 @@ spec:
       containers:
       - name: fluentd
         image: fluent/fluentd-kubernetes-daemonset:elasticsearch
+#        image: fluent/fluentd-kubernetes-daemonset:v1.3.0-debian-elasticsearch
         env:
           - name: FLUENT_ELASTICSEARCH_HOST
 #            value: "elasticsearch-svc.default.svc.cluster.local"
@@ -46,22 +47,25 @@ spec:
         - name: varlog
           mountPath: /var/log
         - name: varlibdockercontainers
-          mountPath: /var/lib/docker/containers
+          mountPath: /hosted/k8s_images/docker/containers
           readOnly: true
       terminationGracePeriodSeconds: 30
       volumes:
+      - name: config-source
+        configMap:
+          name: fluentd-config
       - name: varlog
         hostPath:
           path: /var/log
       - name: varlibdockercontainers
         hostPath:
-          path: /var/lib/docker/containers
+          path: /hosted/k8s_images/docker/containers
 ---
 apiVersion: rbac.authorization.k8s.io/v1beta1
 kind: ClusterRole
 metadata:
   name: fluentd
-  namespace: kube-system
+  namespace: NAME_SPACE
 rules:
 - apiGroups:
   - ""
@@ -84,10 +88,10 @@ roleRef:
 subjects:
 - kind: ServiceAccount
   name: fluentd
-  namespace: kube-system
+  namespace: NAME_SPACE
 ---
 apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: fluentd
-  namespace: kube-system
+  namespace: NAME_SPACE
