@@ -11,7 +11,7 @@ KIBANA_NODE_PORTS=30050
 NAME_SPACE="dev-project"
 
 STORAGE_CLASS_NAME="nfs-storageclass"
-template_location="yamls/template/"
+template_location="yamls/templates/"
 
 #Pull images - 5.6버전을 사용한다.
 docker pull elasticsearch:5.6-alpine
