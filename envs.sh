@@ -23,5 +23,4 @@ mariadb_user_name="devs"
 mariadb_pwd="devproject"
 mariadb_replication_pwd="devproject"
 mariadb_node_port=30006
-storage_size="8Gi"
-
+storage_size="10Gi"
