@@ -1,0 +1,10 @@
+{
+    "exec-opts": ["native.cgroupdriver=cgroupfs"],
+    "log-opts": {
+        "max-size": "10m",
+        "max-file": "5"
+    },
+    "data-root": "DOCKER_DATA_ROOT_PATH",
+    "storage-driver": "overlay2",
+    "insecure-registries": ["${privateRepo}"]
+}

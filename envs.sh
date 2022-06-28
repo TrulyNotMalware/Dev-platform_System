@@ -4,10 +4,12 @@
 users=`who | awk '{print $1}'`
 user=`whoami`
 
+DOCKER_DATA_ROOT_PATH="~/docker"
+
 IP_ADDR=`hostname -I| awk '{print $1}'`
 ip_addr=`hostname -I| awk '{print $1}'`
-POD_NET="10.32.0.0/12"
-SERVICE_NET="10.96.0.0/12"
+POD_NET="10.32.0.0/16"
+SERVICE_NET="10.96.0.0/16"
 
 
 node_name=`hostname`
