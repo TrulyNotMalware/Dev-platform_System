@@ -1,6 +1,4 @@
-#!/bin/bash
-
-# 로직 아직 미추가..
+#!/bin/zsh
 
 # Load Service Settings
 source ../envs.sh
