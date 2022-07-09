@@ -4,7 +4,7 @@
 users=`who | awk '{print $1}'`
 user=`whoami`
 
-DOCKER_DATA_ROOT_PATH="~/docker"
+DOCKER_DATA_ROOT_PATH="/images/docker"
 
 IP_ADDR=`hostname -I| awk '{print $1}'`
 ip_addr=`hostname -I| awk '{print $1}'`

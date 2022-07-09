@@ -8,6 +8,7 @@
 > 이 프로젝트는 shell script 들을 run하여, 플랫폼이 구동될 System을 손쉽게 구축해 주는 프로젝트 입니다.
 
 ```
+#CentOS Bash
 #sudo need.
 sudo ./0.dependencies.sh
 sudo ./1.install_kubernetes.sh
@@ -18,10 +19,14 @@ sudo ./1.install_kubernetes.sh
 
 #Check
 kubectl get pod -A
+
+#Ubuntu Zsh
+./1.initialize.sh
 ```
 
 ## Support Server OS
-+ CentOS 7
++ CentOS 7 [bash]
++ Ubuntu 20.04 [Zsh]
 
 ## Install lists
 + docker
